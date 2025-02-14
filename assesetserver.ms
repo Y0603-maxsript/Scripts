@@ -1,42 +1,65 @@
-
-
-rollout assetTrackerRollout "Asset Tracker"
+rollout assetServerRollout "Asset Server Checker"
 (
-    listbox assetList "Assets" width:300 height:200
     button btnScan "Scan Assets"
-    edittext totalSizeBox "Total Size (MB):" readonly:true
-    
-    fn getAssetData =
-    (
-        local assets = #()
-        local paths = getFiles "C:\\path\\to\\assets\\*.*" -- Change this path accordingly
-        local totalSize = 0.0
-        
-        for path in paths do
-        (
-            local fileSize = (getFileSize path) / (1024.0 * 1024.0) -- Convert to MB
-            local server = if findString path "Milkyway" != undefined then "Milkyway" else "Core"
-            append assets #(getFilenameFile path, server, fileSize)
-            totalSize += fileSize
-        )
-        
-        return #(assets, totalSize)
-    )
-    
+    listbox lbResults "Results" width:300 height:200
+
     on btnScan pressed do
     (
-        assetList.items = #() -- Clear the list
-        local result = getAssetData()
-        local assets = result[1]
-        local totalSize = result[2]
-        
-        for asset in assets do
+        local result = scanAssetsAndMapToServers()
+        local assetServerMapping = result[1]
+        local serverCounts = result[2]
+
+        lbResults.items = #()
+
+        -- Display asset-to-server mappings
+        for mapping in assetServerMapping do
         (
-            assetList.items += (asset[1] + " | " + asset[2] + " | " + formattedPrint asset[3] format:"%.2f")
+            lbResults.items += #(mapping[1] + " - " + mapping[2])
         )
-        
-        totalSizeBox.text = formattedPrint totalSize format:"%.2f"
+
+        -- Display server count summary
+        lbResults.items += #("Server Counts:")
+        for i = 1 to serverCounts.count do
+        (
+            lbResults.items += #(serverCounts[i][1] + ": " + serverCounts[i][2] as string)
+        )
     )
 )
 
-createDialog assetTrackerRollout 320 300
+createDialog assetServerRollout 400 300
+
+fn checkAssetServer assetPath =
+(
+    if matchPattern assetPath pattern:"*milkyway*" then
+        return "milkyway"
+    else if matchPattern assetPath pattern:"*core*" then
+        return "core"
+    else
+        return "unknown"
+)
+
+fn scanAssetsAndMapToServers =
+(
+    local assets = getFiles "C:/path/to/assets/*.*" -- Change this to your assets directory
+    local assetServerMap = #()
+    
+    -- Use an array to store server counts
+    local serverCounts = #(#("milkyway", 0), #("core", 0), #("unknown", 0))
+
+    for asset in assets do
+    (
+        local server = checkAssetServer asset
+        append assetServerMap #(asset, server)
+
+        -- Update the correct server count
+        for i = 1 to serverCounts.count do
+        (
+            if serverCounts[i][1] == server then
+            (
+                serverCounts[i][2] += 1
+            )
+        )
+    )
+
+    return #(assetServerMap, serverCounts)
+)
