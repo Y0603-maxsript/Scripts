@@ -8,12 +8,23 @@ rollout assetServerRollout "Asset Server Scanner"
         if ATSOps != undefined then 
         (
             local files = ATSOps.GetFiles true  
-            print ("Files Retrieved: " + files as string)  
-            
-           
+            local milkywayCount = 0
+            local coreCount = 0
+
+            for file in files do
+            (
+                if matchPattern file pattern:"*milkyway*" then
+                (
+                    milkywayCount += 1
+                )
+                else if matchPattern file pattern:"*core*" then
+                (
+                    coreCount += 1
+                )
+            )
+
+            lbResults.items = #("Milkyway Server: " + milkywayCount as string, "Core Server: " + coreCount as string)
         ) 
-        
     )
 )
-
 createDialog assetServerRollout
