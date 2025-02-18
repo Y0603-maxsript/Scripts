@@ -1,4 +1,4 @@
-------------------------| Task Number | Description                  |
+| Task Number | Description                  |
 |-------------|------------------------------|
 | 1           | Proxy Count |
 | 2           | Bitmap bitween 1k to 4k |
