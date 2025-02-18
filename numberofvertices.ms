@@ -1,23 +1,28 @@
 (
-    fn getLayerVerticesCount layer =
+    local layerVertexCounts = #()
+    
+    for i in 0 to (LayerManager.count - 1) do
     (
+        local currentLayer = LayerManager.getLayer i
+        local layerName = currentLayer.name
         local vertexCount = 0
-        for i = 1 to (layer.nodes as array).count do
+        
+        for obj in objects do
         (
-            local obj = layer.nodes[i]
-            if isKindOf obj Editable_Poly or isKindOf obj Editable_Mesh then
+            if obj.layer.name == layerName and superClassOf obj == GeometryClass do
             (
-                vertexCount += getVertCount obj
+                local tempMesh = snapshotAsMesh obj
+                if tempMesh != undefined do
+                (
+                    vertexCount += tempMesh.numVerts
+                )
             )
         )
-        return vertexCount
+        
+        append layerVertexCounts #(layerName, vertexCount)
     )
-
-    for i = 0 to (LayerManager.count - 1) do
-    (
-        local layer = LayerManager.getLayer i
-        local layerName = layer.name
-        local verticesCount = getLayerVerticesCount layer
-        format "Layer: % - Vertices: %\n" layerName verticesCount
-    )
+    
+    qsort layerVertexCounts (fn compareLayers a b = b[2] - a[2])
+    
+    for i in layerVertexCounts do format "%: %\n" i[1] i[2]
 )
