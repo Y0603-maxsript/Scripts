@@ -7,78 +7,20 @@ rollout ProxyTools "Proxy Tools" width:206 height:187
 	button 'btnbtmpres' "BitMap Res 2K to 4K" pos:[4,80] width:187 height:18 align:#left
 	edittext 'edtOutput' "Output" pos:[8,106] width:185 height:60 readOnly:true align:#left
 	
+	-- Local Variables
+	--------------------
+	local Proxies = #()
+
+	-- Functions
+	--------------------
+
 	--gating proxy form the scene
 	function getProxyObjects =
 	(
 		local proxies = for obj in geometry where (classof obj == CProxy) collect obj
 		return proxies
 	)
-	
-	--counting all unique proxy objects 
-	on btnCount pressed do
-	(
-		local proxies = getProxyObjects()
-		local uniqueProxies = #()
-		for proxy in proxies do
-		(
-			if findItem uniqueProxies proxy.fileName == 0 do
-				append uniqueProxies proxy.fileName
-		)
 		
-		edtOutput.text = "Total Proxies: " + uniqueProxies.count as string
-		if uniqueProxies.count == 0 then edtOutput.text = "No Proxies Found"
-	)
-
-	--getting the size of each unique proxy object
-	on btnIndividualSize pressed do
-	(
-		local proxies = getProxyObjects()
-		local uniqueProxies = #()
-		local output = ""
-		for proxy in proxies do
-		(
-			if findItem uniqueProxies proxy.fileName == 0 do
-			(
-				append uniqueProxies proxy.fileName
-				output += proxy.name + ": " + (getFileSize proxy.fileName/1024.00/1024.00) as string + " MB\n"
-			)
-		)
-		edtOutput.text = output
-	)
-
-	-- getting total size of proxy
-	on btnTotalsize pressed do
-	(
-		local proxies = getProxyObjects()
-		local uniqueProxies = #()
-		local totalSize = 0
-		for proxy in proxies do
-		(
-			if findItem uniqueProxies proxy.fileName == 0 do
-			(
-				append uniqueProxies proxy.fileName
-				totalSize += getFileSize proxy.fileName
-			)	
-		)
-
-		
-	)
-	--getting the total size of all unique proxy objects
-	on btnTotalSize pressed do
-	(
-		local proxies = getProxyObjects()
-		local uniqueProxies = #()
-		local totalSize = 0
-		for proxy in proxies do
-		(
-			if findItem uniqueProxies proxy.fileName == 0 do
-			(
-				append uniqueProxies proxy.fileName
-				totalSize += (getFileSize proxy.fileName)
-			)
-		)
-		edtOutput.text = "Total Proxy Size: " + (totalSize/1024.00/1024.00) as string + " MB\n"
-	)
 	function isHighRes bitmapTex = (
 		if (isKindOf bitmapTex Bitmaptexture) then (
 			local bmp = bitmapTex.bitmap
@@ -97,6 +39,78 @@ rollout ProxyTools "Proxy Tools" width:206 height:187
 			isHighRes tex
 		)
 	)
+
+	-- Rollout Events
+	--------------------
+
+	--counting all unique proxy objects 
+	on btnCount pressed do
+	(	
+		local proxies = getProxyObjects()
+		local uniqueProxies = #()
+		for proxy in Proxies do
+		(
+			if findItem uniqueProxies proxy.fileName == 0 do
+				append uniqueProxies proxy.fileName
+		)
+		
+		edtOutput.text = "Total Proxies: " + uniqueProxies.count as string
+		if uniqueProxies.count == 0 then edtOutput.text = "No Proxies Found"
+	)
+
+	--getting the size of each unique proxy object
+	on btnIndividualSize pressed do
+	(
+		local proxies = getProxyObjects()
+		local uniqueProxies = #()
+		local outputText = ""
+
+		for proxy in proxies do
+		(
+			if findItem uniqueProxies proxy.fileName == 0 do
+			(
+				append uniqueProxies proxy.fileName
+				outputText += proxy.name + ": " + (getFileSize proxy.fileName/1024.00/1024.00) as string + " MB\n"
+			)
+		)
+
+		edtOutput.text = outputText
+	)
+
+	-- getting total size of proxy
+	on btnTotalsize pressed do
+	(
+		local proxies = getProxyObjects()
+		local uniqueProxies = #()
+		local totalSize = 0
+
+		for proxy in proxies do
+		(
+			if findItem uniqueProxies proxy.fileName == 0 do
+			(
+				append uniqueProxies proxy.fileName
+				totalSize += getFileSize proxy.fileName
+			)	
+		)
+	)
+
+	--getting the total size of all unique proxy objects
+	on btnTotalSize pressed do
+	(
+		local proxies = getProxyObjects()
+		local uniqueProxies = #()
+		local totalSize = 0
+		for proxy in proxies do
+		(
+			if findItem uniqueProxies proxy.fileName == 0 do
+			(
+				append uniqueProxies proxy.fileName
+				totalSize += (getFileSize proxy.fileName)
+			)
+		)
+		edtOutput.text = "Total Proxy Size: " + (totalSize/1024.00/1024.00) as string + " MB\n"
+	)
+
 
 	on btnbtmpres pressed do
 	(

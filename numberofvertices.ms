@@ -19,7 +19,7 @@
             )
         )
         
-        append layerVertexCounts #(layerName, vertexCount)
+        append layerVertexCounts #(layerName, vertexCount)  
     )
     
     qsort layerVertexCounts (fn compareLayers a b = b[2] - a[2])
